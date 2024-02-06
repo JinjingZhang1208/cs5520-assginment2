@@ -2,8 +2,10 @@ import { StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 import Button from '../components/Button'
 import Colors from '../colors'
+import { useNavigation } from '@react-navigation/native'; 
 
 export default function Start() {
+    const navigation = useNavigation(); 
     const [email, setEmail] = useState('');
     const [phonenumber, setPhonenumber] = useState('');
     const [emailError, setEmailError] = useState('');
@@ -31,7 +33,7 @@ export default function Start() {
     }
     
     const handleStartButton = () => { 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         const phoneRegex = /^[0-9]{10}$/;
         //check if email and phone number are valid
         if (!emailRegex.test(email)) {
@@ -43,8 +45,7 @@ export default function Start() {
         }
 
         if (emailRegex.test(email) && phoneRegex.test(phonenumber)) {
-            //navigate to the next screen
-            console.log('Navigate to the next screen');
+            navigation.navigate("AllActivity");
         }
     }
 
@@ -59,7 +60,7 @@ export default function Start() {
             <View style={styles.buttonContainer}>
                 <Button title="Reset" onPress={handleReset} />
                 <Button title="Start" onPress={handleStartButton} disabled={inputEmpty} />
-        </View>
+            </View>
         </View>
     )
 }
