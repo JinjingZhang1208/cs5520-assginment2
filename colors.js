@@ -5,6 +5,7 @@ const Colors = {
     activeBottomBarTab: '#F1EA07',
     inactiveBottomBarTab: '#E8DFE8',
     bottomBar: '#644766',
+    headerTextColor: '#FBFBF7',
   };
   
   export default Colors;

@@ -54,24 +54,40 @@ const TabNavigator = () => {
         position: 'absolute',
         left: 0,
         right: 0,
-        bottom: 0,
+        height: 80,
       },
     }}>
     <Tab.Screen 
-      name="All Activities" 
-      component={AllActivityScreen} 
-      options={{
-        headerShown: false,
-        tabBarIcon: ({ color, size }) => (
-          <MaterialIcons name="attach-money" size={size} color={color} />
-        ),
-      }}
-    />
+        name="All Activities" 
+        component={AllActivityScreen} 
+        options={{
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: Colors.bottomBar,
+          },
+          headerTitleStyle: {
+            color: Colors.headerTextColor,
+            fontSize: 20,
+          },
+          title: 'All Activities',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="attach-money" size={size} color={color} />
+          ),
+        }}
+      />
     <Tab.Screen 
       name="Special Activities" 
       component={SpecialActivityScreen} 
       options={{
-        headerShown: false,
+        headerShown: true, 
+        headerStyle: {
+          backgroundColor: Colors.bottomBar,
+        },
+        headerTitleStyle: {
+          color: Colors.headerTextColor,
+          fontSize: 20,
+        },
+        title: 'Special Activities' ,
         tabBarIcon: ({ color, size }) => (
           <AntDesign name="exclamation" size={size} color={color}/>
         ),
@@ -84,14 +100,13 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-    <SafeAreaView style={styles.container}>
-     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Start">
+     <NavigationContainer style ={styles.container}>
+      <Stack.Navigator 
+       initialRouteName="Start">
         <Stack.Screen name="Start" component={StartScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="AllActivity" component={TabNavigator} options={{ headerShown: false }}  />
+        <Stack.Screen name="AllActivity" component={TabNavigator} options={{ headerShown: false }} />
       </Stack.Navigator>
      </NavigationContainer>
-    </SafeAreaView>
   );
 }
 
