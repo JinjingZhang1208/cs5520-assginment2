@@ -1,22 +1,83 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useContext } from 'react'
+import React, { useContext } from 'react';
 import { ActivityContext } from '../ActivityContext';
+import { View, FlatList, Text, StyleSheet } from 'react-native';
+import Colors from '../colors';
 
-export default function ActivitiesList() {
+export default function ActivitiesList({ type }) {
   const { activityArray } = useContext(ActivityContext);
 
-  return (
-    <View style={styles.container}>
-    <Text>Activities List</Text>
-    {activityArray.map((activity, index) => (
-      <View key={index} style={styles.activityItem}>
-        <Text>{activity.name}</Text>
-        <Text>{activity.duration}</Text>
-        <Text>{activity.date.toLocaleDateString()}</Text>
+  // Filter the activities based on the type
+  const filteredActivities = (type === 'all') ? activityArray : activityArray.filter(activity => activity.special);
+
+  const renderItem = ({ item }) => (
+    <View style={styles.activityItem}>
+      <View style={styles.details}>
+        <View style={styles.activityNameContainer}>
+          <Text style={styles.activityName}>{item.name}</Text>
+        </View>      
+        <View style={styles.dateContainer}>
+          <Text style={styles.date}>
+            {`${item.date.toLocaleDateString('en-US', { weekday: 'short' })} ${item.date.toLocaleDateString('en-US', { month: 'short' })} ${item.date.getDate()} ${item.date.getFullYear()}`}
+          </Text>
+        </View>
+        <View style={styles.durationContainer}>
+          <Text style={styles.duration}>{`${item.duration} min`}</Text>
+        </View>
       </View>
-    ))}
-  </View>
-  )
+    </View>
+  );
+
+  return (
+    <FlatList
+      data={filteredActivities}
+      renderItem={renderItem}
+      keyExtractor={(item, index) => index.toString()}
+    />
+  );
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  activityItem: {
+    borderWidth: 2,
+    borderColor: Colors.border,
+    borderRadius: 5,
+    padding: 15,
+    marginVertical: 10,
+    width: '90%',
+    alignSelf: 'center',
+    backgroundColor: "purple",
+  },
+  activityName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  details: {
+    flexDirection: 'row',
+  },
+  activityNameContainer: {
+    flex: 1,
+  },
+  dateContainer: {
+    width: 150,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    marginRight: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  durationContainer: {
+    width: 100,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    marginLeft: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  date: {
+    padding: 10,
+  },
+  duration: {
+    padding: 10,
+  },
+});

@@ -14,13 +14,13 @@ export default function AddActivity() {
     const [open, setOpen] = useState(false);
     const [selectedActivity, setSelectedActivity] = useState(null);
     const [items, setItems] = useState([
-      {label: 'Walking', value: 'walking'},
-      {label: 'Running', value: 'running'},
-      {label: 'Swimming', value: 'swimming'},
-      {label: 'Weights', value: 'weights'},
-      {label: 'Yoga', value: 'yoga'},
-      {label: 'Cycling', value: 'cycling'},
-      {label: 'Hiking', value: 'hiking'},
+      {label: 'Walking', value: 'Walking'},
+      {label: 'Running', value: 'Running'},
+      {label: 'Swimming', value: 'Swimming'},
+      {label: 'Weights', value: 'Weights'},
+      {label: 'Yoga', value: 'Yoga'},
+      {label: 'Cycling', value: 'Cycling'},
+      {label: 'Hiking', value: 'Hiking'},
     ]);
     //store data related to the date
     const [date, setDate] = useState(new Date());
@@ -50,7 +50,7 @@ export default function AddActivity() {
         const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
         return date.toLocaleDateString('en-US', options);
       } else {
-        return ''; // Return empty string when date is null
+        return ''; 
       }
     };
 
@@ -66,18 +66,18 @@ export default function AddActivity() {
           Alert.alert('Invalid input', 'Please check your input values', [
             {text: 'OK'},
           ]);
-      }
+      } else {
       // When all validations passed, store the data to the context and redirect the user to the previous screen.
       addToActivityArray({ name: selectedActivity, duration, date });
       setSelectedActivity(null);
       setDuration('');
       setDate('');
       navigation.goBack();
-      }
+    }}
 
     return (
       <View style = {styles.container}>
-        <Text style={styles.subtitle1}>Activity *</Text>
+        <Text style={styles.subtitle}>Activity *</Text>
         <DropDownPicker
             placeholder="Select An Activity" 
             open={open}
@@ -119,13 +119,14 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center', 
     alignItems: 'center',
+    flex: 1,
   },
   dateContainer: {
     backgroundColor: "white",
     marginTop: 10,
     flexDirection: "row",
     alignItems: "center",
-    width: 400, 
+    width: '80%',
     height: 40,
     borderRadius: 5,
     borderWidth: 1, 
@@ -137,7 +138,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     flexDirection: "row",
     alignItems: "center",
-    width: 400, 
+    width: '80%',
     height: 40,
     borderRadius: 5,
     borderWidth: 1, 
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   dropDownContainer: {
-    width: 400, 
+    width: '80%',
     marginTop: 3,
     borderRadius: 5,
     marginBottom: 10,
@@ -156,17 +157,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: Colors.text,
   },
-  subtitle1: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 40,
-    color: Colors.text,
-  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '60%',
-    marginTop: 400,
+    width: '55%',
+    marginTop: '62%',
   },
   button: {
     paddingVertical: 10,

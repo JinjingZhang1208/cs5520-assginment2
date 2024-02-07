@@ -93,7 +93,7 @@ const TabNavigator = () => {
           },
           title: 'All Activities',
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="attach-money" size={size} color={color} />
+            <MaterialIcons name="select-all" size={size} color={color} />
           ),
         }}
       />
@@ -119,7 +119,7 @@ const TabNavigator = () => {
         },
         title: 'Special Activities' ,
         tabBarIcon: ({ color, size }) => (
-          <AntDesign name="exclamation" size={size} color={color}/>
+          <MaterialIcons name="select-all" size={size} color={color} />
         ),
       }}
     />

@@ -5,7 +5,7 @@ import ActivitiesList from '../components/ActivitiesList'
 export default function AllActivity({navigation}) {
   return (
     <View>
-      <ActivitiesList />
+      <ActivitiesList type="all" />
     </View>
   )
 }
