@@ -1,14 +1,15 @@
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import Start from './screens/Start';
 import AllActivity from './screens/AllActivity';
 import SpecialActivity from './screens/SpecialActivity';
 import Colors from './colors';
 import * as React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer, useNavigation} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
+import AddActivity from './screens/AddActivity';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -37,7 +38,16 @@ function SpecialActivityScreen() {
   );
 }
 
+function AddActivityScreen() {
+  return (
+    <SafeAreaView style={styles.container}>
+      <AddActivity />
+    </SafeAreaView>
+  );
+}
+
 const TabNavigator = () => {
+  const navigation = useNavigation();
   return (
     <Tab.Navigator
     screenOptions={{
@@ -54,7 +64,8 @@ const TabNavigator = () => {
         position: 'absolute',
         left: 0,
         right: 0,
-        height: 80,
+        height: 75,
+        paddingBottom: 10,
       },
     }}>
     <Tab.Screen 
@@ -62,6 +73,14 @@ const TabNavigator = () => {
         component={AllActivityScreen} 
         options={{
           headerShown: true,
+          headerRight: () => (
+            <TouchableOpacity
+              style={{ marginRight: 15 }}
+              onPress={() => navigation.navigate('AddActivity')}
+            >
+              <Text style={styles.headerButtonText}>Add</Text>
+            </TouchableOpacity>
+          ),
           headerStyle: {
             backgroundColor: Colors.bottomBar,
           },
@@ -80,6 +99,14 @@ const TabNavigator = () => {
       component={SpecialActivityScreen} 
       options={{
         headerShown: true, 
+        headerRight: () => (
+          <TouchableOpacity
+            style={{ marginRight: 15 }}
+            onPress={() => navigation.navigate('AddActivity')}
+          >
+            <Text style={styles.headerButtonText}>Add</Text>
+          </TouchableOpacity>
+        ),
         headerStyle: {
           backgroundColor: Colors.bottomBar,
         },
@@ -105,6 +132,17 @@ export default function App() {
        initialRouteName="Start">
         <Stack.Screen name="Start" component={StartScreen} options={{ headerShown: false }} />
         <Stack.Screen name="AllActivity" component={TabNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name="AddActivity" component={AddActivityScreen} 
+          options={{ 
+            headerShown: false, 
+            headerLeft: () => (
+              <TouchableOpacity
+                style={{ marginLeft: 15 }}
+                onPress={() => navigation.goBack()}
+              >
+                <AntDesign name="arrowleft" size={24} color={Colors.headerTextColor} />
+              </TouchableOpacity>
+            )}} />
       </Stack.Navigator>
      </NavigationContainer>
   );
