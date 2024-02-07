@@ -50,6 +50,7 @@ const TabNavigator = () => {
   const navigation = useNavigation();
   return (
     <Tab.Navigator
+    //give the tab bar a style
     screenOptions={{
       tabBarActiveTintColor: Colors.activeBottomBarTab,
       tabBarInactiveTintColor: Colors.inactiveBottomBarTab,
@@ -126,6 +127,7 @@ const TabNavigator = () => {
 
 
 export default function App() {
+
   return (
      <NavigationContainer style ={styles.container}>
       <Stack.Navigator 
@@ -133,16 +135,26 @@ export default function App() {
         <Stack.Screen name="Start" component={StartScreen} options={{ headerShown: false }} />
         <Stack.Screen name="AllActivity" component={TabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="AddActivity" component={AddActivityScreen} 
-          options={{ 
-            headerShown: false, 
+          options={({ navigation }) => ({ 
+            headerShown: true, 
+            headerStyle: {
+              backgroundColor: Colors.bottomBar,
+            },
+            title: 'Add an activity',
+            headerTintColor: 'white', 
+            headerTitleStyle: {
+              fontSize: 20, 
+            },
             headerLeft: () => (
               <TouchableOpacity
-                style={{ marginLeft: 15 }}
+                style={{ marginLeft: 10 }}
                 onPress={() => navigation.goBack()}
               >
-                <AntDesign name="arrowleft" size={24} color={Colors.headerTextColor} />
+                <AntDesign name="left" size={22} color="white" />
               </TouchableOpacity>
-            )}} />
+            )
+          })}
+        />
       </Stack.Navigator>
      </NavigationContainer>
   );
