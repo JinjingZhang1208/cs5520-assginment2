@@ -10,9 +10,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import AddActivity from './screens/AddActivity';
+import { ActivityProvider } from './ActivityContext'; 
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
 
 function StartScreen() {
   return (
@@ -129,6 +131,7 @@ const TabNavigator = () => {
 export default function App() {
 
   return (
+    <ActivityProvider> 
      <NavigationContainer style ={styles.container}>
       <Stack.Navigator 
        initialRouteName="Start">
@@ -157,6 +160,7 @@ export default function App() {
         />
       </Stack.Navigator>
      </NavigationContainer>
+     </ActivityProvider> 
   );
 }
 
@@ -164,5 +168,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  headerButtonText: {
+    color: Colors.addButtonText,
+    fontSize: 16,
   },
 });

@@ -37,11 +37,11 @@ export default function Start() {
         const phoneRegex = /^[0-9]{10}$/;
         //check if email and phone number are valid
         if (!emailRegex.test(email)) {
-            setEmailError('Please enter a valid email address');
+            setEmailError('Please enter a valid email address.');
         }
 
         if (!phoneRegex.test(phonenumber)) {
-            setPhonenumberError('Please enter a valid phone number');
+            setPhonenumberError('Please enter a valid phone number.');
         }
 
         if (emailRegex.test(email) && phoneRegex.test(phonenumber)) {
@@ -53,10 +53,10 @@ export default function Start() {
         <View style = {styles.container}>
             <Text style={styles.word}>Email Address</Text>
             <TextInput onChangeText={emailHandler} style={styles.input} value={email}/>
-            {emailError ? <Text>{emailError}</Text> : null}
+            {emailError ? <Text style={styles.errorMessage}>{emailError}</Text> : null}
             <Text style={styles.word}>Phone Number</Text>
             <TextInput onChangeText={phonenumberHandler} style={styles.input} value={phonenumber}/>
-            {phonenumberError ? <Text>{phonenumberError}</Text> : null}
+            {phonenumberError ? <Text style={styles.errorMessage}>{phonenumberError}</Text> : null}
             <View style={styles.buttonContainer}>
                 <Button title="Reset" onPress={handleReset} />
                 <Button title="Start" onPress={handleStartButton} disabled={inputEmpty} />
@@ -92,5 +92,9 @@ const styles = StyleSheet.create({
         marginRight: 220,
         marginBottom: 5, 
         color: Colors.text,
+    },
+    errorMessage: {
+        marginBottom: 10,
+        marginTop: 10,
     }
 })
