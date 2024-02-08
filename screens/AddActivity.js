@@ -61,8 +61,17 @@ export default function AddActivity() {
 
     //validate user's entries (e.g. no negative number or letters for duration, no empty submission,...)
     const validateData = () => {
-      if (duration === '' || selectedActivity === null || isNaN(parseInt(duration)) || (parseInt(duration) < 0)
-        || date === null || date === '' || date === undefined) {
+      const durationNumber = parseInt(duration);
+      if (
+        duration.trim() === '' || // Check for empty or whitespace duration
+        selectedActivity === null || // Check if an activity is selected
+        isNaN(durationNumber) || // Check if duration is not a number
+        durationNumber < 0 || // Check if duration is less than 0
+        duration !== durationNumber.toString() || // Check if duration contains non-numeric characters
+        date === null || // Check if date is null
+        date === '' || // Check if date is empty
+        date === undefined // Check if date is undefined
+      ) {
           Alert.alert('Invalid input', 'Please check your input values', [
             {text: 'OK'},
           ]);

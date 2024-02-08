@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 15,
     marginVertical: 10,
-    width: '90%',
+    width: '98%',
     alignSelf: 'center',
     backgroundColor: "purple",
   },
@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: 'white',
+    marginTop: 6,
   },
   details: {
     flexDirection: 'row',
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   dateContainer: {
-    width: 150,
+    width: 140,
     backgroundColor: 'white',
     borderRadius: 10,
     marginRight: 5,
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   durationContainer: {
-    width: 100,
+    width: 90,
     backgroundColor: 'white',
     borderRadius: 10,
     marginLeft: 5,
