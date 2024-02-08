@@ -76,6 +76,7 @@ const TabNavigator = () => {
         component={AllActivityScreen} 
         options={{
           headerShown: true,
+          headerTitleAlign: 'center',
           headerRight: () => (
             <TouchableOpacity
               style={{ marginRight: 15 }}
@@ -102,6 +103,7 @@ const TabNavigator = () => {
       component={SpecialActivityScreen} 
       options={{
         headerShown: true, 
+        headerTitleAlign: 'center',
         headerRight: () => (
           <TouchableOpacity
             style={{ marginRight: 15 }}
@@ -133,8 +135,7 @@ export default function App() {
   return (
     <ActivityProvider> 
      <NavigationContainer style ={styles.container}>
-      <Stack.Navigator 
-       initialRouteName="Start">
+      <Stack.Navigator initialRouteName="Start">
         <Stack.Screen name="Start" component={StartScreen} options={{ headerShown: false }} />
         <Stack.Screen name="AllActivity" component={TabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="AddActivity" component={AddActivityScreen} 
