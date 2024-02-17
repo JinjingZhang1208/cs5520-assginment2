@@ -1,10 +1,11 @@
-import { StyleSheet, Text, TextInput, View, Alert, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, TextInput, View, Alert } from 'react-native'
 import React, { useState, useContext } from 'react'
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Colors from '../colors';
 import { useNavigation } from '@react-navigation/native';
 import { ActivityContext } from '../ActivityContext';
+import PressableButton from '../components/PressableButton';
 
 export default function AddActivity() {
     const navigation = useNavigation();
@@ -116,12 +117,11 @@ export default function AddActivity() {
             <Text style={styles.buttonText}>Cancel</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={validateData} style={styles.button}>
-              <Text style={styles.buttonText}>Save</Text>
+            <Text style={styles.buttonText}>Save</Text>
           </TouchableOpacity>
         </View>
       </View>
     );
- 
 }
 
 const styles = StyleSheet.create({

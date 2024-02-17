@@ -1,3 +1,4 @@
+//color helper file
 const Colors = {
     background: '#D58FDA',
     text: '#902098',

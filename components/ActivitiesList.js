@@ -4,7 +4,6 @@ import { View, FlatList, Text, StyleSheet } from 'react-native';
 import Colors from '../colors';
 import { AntDesign } from '@expo/vector-icons';
 
-
 export default function ActivitiesList({ type }) {
   const { activityArray } = useContext(ActivityContext);
 
@@ -15,8 +14,7 @@ export default function ActivitiesList({ type }) {
     <View style={styles.activityItem}>
       <View style={styles.details}>
         <View style={styles.activityNameContainer}>
-          <Text style={styles.activityName}>{item.name} {item.special && <AntDesign name="star" size={16} color="yellow" />}</Text>
-          
+          <Text style={styles.activityName}>{item.name} {item.special && <AntDesign name="star" size={16} color="yellow" />}</Text>       
         </View>      
         <View style={styles.dateContainer}>
           <Text style={styles.date}>
