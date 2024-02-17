@@ -69,7 +69,7 @@ export default function Start() {
                         <Text style={styles.buttonText}>Reset</Text>
                 </PressableButton>
                 <PressableButton onPress={handleStartButton} disabled={inputEmpty} customStyle={{ backgroundColor: Colors.border }}>
-                <Text style={inputEmpty ? styles.disabledButtonText : styles.buttonText}>Start</Text>
+                    <Text style={inputEmpty ? styles.disabledButtonText : styles.buttonText}>Start</Text>
                 </PressableButton>
             </View>
         </View>

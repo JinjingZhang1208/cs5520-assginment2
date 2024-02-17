@@ -27,7 +27,7 @@ export default function PressableButton({
 const styles = StyleSheet.create({
   defaultStyle: {
     borderRadius: 5,
-    padding: 5,
+    padding: 9,
     backgroundColor: "#aaa",
   },
   pressed: {

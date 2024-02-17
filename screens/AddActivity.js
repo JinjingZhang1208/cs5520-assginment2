@@ -101,9 +101,12 @@ export default function AddActivity() {
         <Text style={styles.subtitle}>Duration (min) * </Text>
         <TextInput value={duration} onChangeText={setDuration} style={styles.durationContainer}/>
         <Text style={styles.subtitle}>Date</Text>
-        <TouchableOpacity onPress={showDatepicker} style={styles.dateContainer}>
+        {/* <TouchableOpacity onPress={showDatepicker} style={styles.dateContainer}>
         <Text style={styles.dateText}>{formatDate(date)}</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <PressableButton onPress={showDatepicker} customStyle={styles.dateContainer}>
+          <Text style={styles.dateText}>{formatDate(date)}</Text>
+        </PressableButton>
         {showDate && (
           <DateTimePicker
             value={date}
@@ -113,12 +116,18 @@ export default function AddActivity() {
           />
         )}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={cancelRedirect} style={styles.button}>
+          {/* <TouchableOpacity onPress={cancelRedirect} style={styles.button}>
             <Text style={styles.buttonText}>Cancel</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={validateData} style={styles.button}>
             <Text style={styles.buttonText}>Save</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <PressableButton onPress={cancelRedirect} customStyle={styles.button}>
+            <Text style={styles.buttonText}>Cancel</Text>
+          </PressableButton>
+          <PressableButton onPress={validateData} customStyle={styles.button}>
+            <Text style={styles.buttonText}>Save</Text>
+          </PressableButton>
         </View>
       </View>
     );
@@ -176,8 +185,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
+    backgroundColor: Colors.border,
 },
-buttonText: {
+  buttonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
