@@ -18,6 +18,7 @@ export default function PressableButton({
         disabled ? styles.disabled : null, 
         pressed && !disabled ? styles.pressed : null,
       ]}
+      android_ripple={{ color: 'rgba(255, 255, 255, 0.3)' }}
     >
       {children}
     </Pressable>
