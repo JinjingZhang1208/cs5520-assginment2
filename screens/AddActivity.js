@@ -7,15 +7,16 @@ import { useNavigation } from '@react-navigation/native';
 import PressableButton from '../components/PressableButton';
 import { writeToDB } from '../firebase-files/firestoreHelper';
 import { collection, onSnapshot } from 'firebase/firestore';
-import { database } from '../firebase-files/firebaseSetup';
+import { useRoute } from '@react-navigation/native';
 
 export default function AddActivity() {
     const navigation = useNavigation();
-    // set default mode to 'add' (add new activity)
-    const [pageMode, setPageMode] = useState('add');
+
+    const route = useRoute();
+    const { activity } = route.params;
+
     //store the id of the activity that the user wants to edit
     const [activityId, setActivityId] = useState(null); 
-    const [activitiesArray, setActivitiesArray] = useState([]);
       
     // Store data related to the activity
     const [open, setOpen] = useState(false);
@@ -36,6 +37,16 @@ export default function AddActivity() {
     // Store data related to the duration
     const [duration, setDuration] = useState('');
     
+    useEffect(() => {
+      if (activity) {
+        setSelectedActivity(activity.name);
+        setDuration(activity.duration);
+        if (activity.date) {
+          setDate(activity.date.toDate());
+        }
+      }
+    }, []);
+
     const onChangeDate = (event, selectedDate) => {
         const currentDate = selectedDate || date;
         setShowDate(false);
@@ -67,7 +78,7 @@ export default function AddActivity() {
     }
 
     // Validate user's entries (e.g. no negative number or letters for duration, no empty submission,...)
-    const validateData = () => {
+    const validateData = async () => {
       const durationNumber = parseInt(duration);
       if (
         duration.trim() === '' || // Check for empty or whitespace duration
@@ -86,8 +97,8 @@ export default function AddActivity() {
         // Create a new activity object
         const newActivity = {
           name: selectedActivity,
-          duration: duration,
-          date: date,
+          duration: duration, 
+          date: firebase.firestore.Timestamp.fromDate(date),
           special: false // By default, set the activity as not special
         };
     
@@ -97,8 +108,10 @@ export default function AddActivity() {
         }
     
         // Store the new activity in the database
-        writeToDB(newActivity);
-    
+        const newActivityId = await writeToDB(newActivity);
+        setActivityId(newActivityId);
+        // console.log(newActivityId);
+        
         // Reset state values and navigate back
         setSelectedActivity(null);
         setDuration('');
@@ -107,7 +120,6 @@ export default function AddActivity() {
       }
     };
     
-
     return (
       <View style = {styles.container}>
         <Text style={styles.subtitle}>Activity *</Text>

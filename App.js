@@ -143,6 +143,27 @@ export default function App() {
             headerStyle: {
               backgroundColor: Colors.bottomBar,
             },
+            title: 'Add An Activity',
+            headerTintColor: 'white', 
+            headerTitleStyle: {
+              fontSize: 20, 
+            },
+            headerLeft: () => (
+            <PressableButton
+              customStyle={{ marginRight: 10, backgroundColor: Colors.bottomBar }}
+              onPress={() => navigation.goBack()}
+            >
+              <AntDesign name="left" size={22} color="white" />
+            </PressableButton>
+            ),
+          })}
+        />
+        <Stack.Screen name="Edit" component={AddActivityScreen} 
+          options={({ navigation }) => ({ 
+            headerShown: true, 
+            headerStyle: {
+              backgroundColor: Colors.bottomBar,
+            },
             title: 'Edit',
             headerTintColor: 'white', 
             headerTitleStyle: {
@@ -156,12 +177,13 @@ export default function App() {
               <AntDesign name="left" size={22} color="white" />
             </PressableButton>
             ),
-            //the button will only appear if the user is editing an existing activity
+            //delete button
             headerRight: () => (
               <PressableButton
                 customStyle={{ marginRight: 15, backgroundColor: Colors.bottomBar}}
                 onPress={() => {
-                  deleteFromDB();
+                  deleteFromDB(navigation.getParam('id'));
+                  navigation.goBack();
               }}
               >
                 <AntDesign name="delete" size={24} color="white" />

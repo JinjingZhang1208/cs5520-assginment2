@@ -1,9 +1,11 @@
-import { collection, addDoc, doc, deleteDoc, query, onSnapshot } from "firebase/firestore";
+import { collection, addDoc, doc, deleteDoc } from "firebase/firestore";
 import { database } from "./firebaseSetup";
 
 export async function writeToDB(data) {
   try {
-    await addDoc(collection(database, "activities"), data);
+    const docRef = await addDoc(collection(database, "activities"), data);
+    // console.log('Document added with ID: ', docRef.id);
+    return docRef.id;
   } catch (err) {
     console.log(err);
   }

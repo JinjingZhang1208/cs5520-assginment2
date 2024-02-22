@@ -4,42 +4,55 @@ import Colors from '../colors';
 import { AntDesign } from '@expo/vector-icons';
 import { database } from '../firebase-files/firebaseSetup';
 import { collection, onSnapshot } from 'firebase/firestore';
+import { useNavigation } from '@react-navigation/native';
+import PressableButton from './PressableButton';
 
 export default function ActivitiesList({ type }) {
-  const [activityArray, setActivities] = useState([]);
+  const navigation = useNavigation();
+  const [activityArray, setActivityArray] = useState([]);
+
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(database, 'activities'), (querySnapshot) => {
       const activitiesData = [];
       querySnapshot.forEach((doc) => {
-        activitiesData.push({ id: doc.id, ...doc.data() });
+        const data = doc.data();
+        activitiesData.push({ id: doc.id, name: data.name, duration: data.duration, date: data.date }); 
       });
-      setActivities(activitiesData);
+      setActivityArray(activitiesData);
     });
-
+  
     return () => unsubscribe();
   }, []);
-
+  
+  
   // Filter the activities based on the type
   const filteredActivities = (type === 'all') ? activityArray : activityArray.filter(activity => type === 'special' ? activity.special : !activity.special);
 
-  const renderItem = ({ item }) => (
-    <View style={styles.activityItem}>
-      <View style={styles.details}>
-        <View style={styles.activityNameContainer}>
-          <Text style={styles.activityName}>{item.name} {item.special && <AntDesign name="star" size={16} color="yellow" />}</Text>       
-        </View>      
-        <View style={styles.dateContainer}>
-          <Text style={styles.date}>
-            {item.date && `${new Date(item.date.seconds * 1000).toLocaleDateString('en-US', { weekday: 'short' })} ${new Date(item.date.seconds * 1000).toLocaleDateString('en-US', { month: 'short' })} ${new Date(item.date.seconds * 1000).getDate()} ${new Date(item.date.seconds * 1000).getFullYear()}`}
-          </Text>
+  const handlePress = (activity) => {
+    navigation.navigate('Edit', { activity });
+  };
+
+  const renderItem = ({ item }) => {
+    return (
+      <PressableButton onPress={() => handlePress(item)} customStyle={styles.activityItem}>
+        <View style={styles.details}>
+          <View style={styles.activityNameContainer}>
+            <Text style={styles.activityName}>
+              {item.name} {item.special && <AntDesign name="star" size={16} color="yellow" />}
+            </Text>
+          </View>
+          <View style={styles.dateContainer}>
+            <Text style={styles.date}>
+              {item.date && `${new Date(item.date.seconds * 1000).toLocaleDateString('en-US', { weekday: 'short' })} ${new Date(item.date.seconds * 1000).toLocaleDateString('en-US', { month: 'short' })} ${new Date(item.date.seconds * 1000).getDate()} ${new Date(item.date.seconds * 1000).getFullYear()}`}
+            </Text>
+          </View>
+          <View style={styles.durationContainer}>
+            <Text style={styles.duration}>{`${item.duration} min`}</Text>
+          </View>
         </View>
-        <View style={styles.durationContainer}>
-          <Text style={styles.duration}>{`${item.duration} min`}</Text>
-        </View>
-      </View>
-    </View>
-  );
-  
+      </PressableButton>
+    );
+  };
 
   return (
     <FlatList
