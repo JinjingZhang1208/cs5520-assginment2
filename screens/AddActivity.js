@@ -11,6 +11,9 @@ import { useRoute } from '@react-navigation/native';
 import { deleteFromDB } from '../firebase-files/firestoreHelper';
 import { AntDesign } from '@expo/vector-icons';
 import { database } from '../firebase-files/firebaseSetup';
+import { updateInDB } from '../firebase-files/firestoreHelper';
+import { doc, setDoc } from 'firebase/firestore';
+
 
 export default function AddActivity() {
     const navigation = useNavigation();
@@ -19,6 +22,8 @@ export default function AddActivity() {
     const { activity } = route.params || {};
 
     const [refreshData, setRefreshData] = useState(false); 
+
+    const [isEditting, setIsEditting] = useState(activity ? 'Edit' : 'AddActivity');
 
     const handleDelete = () => {
       Alert.alert(
@@ -80,6 +85,7 @@ export default function AddActivity() {
     
     useEffect(() => {
       if (activity) {
+        setActivityId(activity.id);
         setSelectedActivity(activity.name);
         setDuration(activity.duration);
         setDate(activity.date.toDate());
@@ -146,12 +152,18 @@ export default function AddActivity() {
         if ((selectedActivity.toLowerCase() === 'running' || selectedActivity.toLowerCase() === 'weights') && durationNumber > 60) {
           newActivity.special = true; // Mark the activity as special
         }
-    
+        console.log("isEditting:", isEditting);
+        if (isEditting === 'Edit') {
+          // Update existing activity
+          console.log("Updating activity with ID:", activity.id);
+          console.log("New activity:", newActivity);
+          await updateInDB(activity.id, newActivity);
+        } else {
         // Store the new activity in the database
         const newActivityId = await writeToDB(newActivity);
         setActivityId(newActivityId);
         // console.log(newActivityId);
-        
+       }
         // Reset state values and navigate back
         setSelectedActivity(null);
         setDuration('');
@@ -214,7 +226,6 @@ export default function AddActivity() {
       </View>
     );
 }
-
 
 const styles = StyleSheet.create({
   container: {

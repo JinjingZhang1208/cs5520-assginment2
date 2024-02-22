@@ -178,6 +178,7 @@ export default function App() {
               <AntDesign name="left" size={22} color="white" />
             </PressableButton>
             ),
+
             //delete button
             // headerRight: () => (
             //   <PressableButton

@@ -30,7 +30,7 @@ export default function ActivitiesList({ type }) {
   const filteredActivities = (type === 'all') ? activityArray : activityArray.filter(activity => activity.special === (type === 'special'));
 
   const handlePress = (activity) => {
-    navigation.navigate('Edit', { activity });
+    navigation.navigate('Edit', { activity});
   };
 
   const renderItem = ({ item }) => {
