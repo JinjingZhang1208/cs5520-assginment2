@@ -8,12 +8,53 @@ import PressableButton from '../components/PressableButton';
 import { writeToDB } from '../firebase-files/firestoreHelper';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { useRoute } from '@react-navigation/native';
+import { deleteFromDB } from '../firebase-files/firestoreHelper';
+import { AntDesign } from '@expo/vector-icons';
+import { database } from '../firebase-files/firebaseSetup';
 
 export default function AddActivity() {
     const navigation = useNavigation();
 
     const route = useRoute();
-    const { activity } = route.params;
+    const { activity } = route.params || {};
+
+    const [refreshData, setRefreshData] = useState(false); 
+
+    const handleDelete = () => {
+      Alert.alert(
+        'Delete',
+        'Are you sure you want to delete this activity?',
+        [
+          {
+            text: 'No',
+            style: 'cancel',
+          },
+          {
+            text: 'Yes',
+            onPress: async () => {
+              await deleteFromDB(activity.id);
+              setRefreshData(prevState => !prevState); // Trigger data refresh
+              navigation.goBack();
+            },
+            style: 'destructive',
+          },
+        ]
+      );
+    };
+
+    useEffect(() => {
+      // Customize the header with the delete button
+      navigation.setOptions({
+        headerRight: () => (
+          <PressableButton
+              customStyle={{ marginRight: 15, backgroundColor: Colors.bottomBar}}
+              onPress={handleDelete}
+            >
+              <AntDesign name="delete" size={24} color="white" />
+            </PressableButton>
+        ),
+      });
+    }, []);
 
     //store the id of the activity that the user wants to edit
     const [activityId, setActivityId] = useState(null); 
@@ -41,11 +82,9 @@ export default function AddActivity() {
       if (activity) {
         setSelectedActivity(activity.name);
         setDuration(activity.duration);
-        if (activity.date) {
-          setDate(activity.date.toDate());
-        }
+        setDate(activity.date.toDate());
       }
-    }, []);
+    }, [activity, refreshData]);
 
     const onChangeDate = (event, selectedDate) => {
         const currentDate = selectedDate || date;
@@ -98,8 +137,9 @@ export default function AddActivity() {
         const newActivity = {
           name: selectedActivity,
           duration: duration, 
-          date: firebase.firestore.Timestamp.fromDate(date),
-          special: false // By default, set the activity as not special
+          date: new Date(date),
+          // By default, set the activity as not special
+          special: false 
         };
     
         // Check if the selected activity is running or weights and the duration is greater than 60 minutes
@@ -116,9 +156,25 @@ export default function AddActivity() {
         setSelectedActivity(null);
         setDuration('');
         setDate('');
+        setRefreshData(prevState => !prevState); // Trigger data refresh
         navigation.goBack();
       }
     };
+    
+    const [activityArray, setActivityArray] = useState([]);
+  
+    useEffect(() => {
+      const unsubscribe = onSnapshot(collection(database, 'activities'), (querySnapshot) => {
+        const activitiesData = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          activitiesData.push({ id: doc.id, name: data.name, duration: data.duration, date: data.date, special: data.special }); 
+        });
+        setActivityArray(activitiesData);
+      });
+    
+      return () => unsubscribe();
+    }, []);
     
     return (
       <View style = {styles.container}>
@@ -158,6 +214,7 @@ export default function AddActivity() {
       </View>
     );
 }
+
 
 const styles = StyleSheet.create({
   container: {

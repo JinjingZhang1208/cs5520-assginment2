@@ -6,6 +6,7 @@ import { database } from '../firebase-files/firebaseSetup';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import PressableButton from './PressableButton';
+import { databse } from '../firebase-files/firebaseSetup';
 
 export default function ActivitiesList({ type }) {
   const navigation = useNavigation();
@@ -16,7 +17,7 @@ export default function ActivitiesList({ type }) {
       const activitiesData = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        activitiesData.push({ id: doc.id, name: data.name, duration: data.duration, date: data.date }); 
+        activitiesData.push({ id: doc.id, name: data.name, duration: data.duration, date: data.date, special: data.special }); 
       });
       setActivityArray(activitiesData);
     });
@@ -26,7 +27,7 @@ export default function ActivitiesList({ type }) {
   
   
   // Filter the activities based on the type
-  const filteredActivities = (type === 'all') ? activityArray : activityArray.filter(activity => type === 'special' ? activity.special : !activity.special);
+  const filteredActivities = (type === 'all') ? activityArray : activityArray.filter(activity => activity.special === (type === 'special'));
 
   const handlePress = (activity) => {
     navigation.navigate('Edit', { activity });

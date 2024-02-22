@@ -132,6 +132,7 @@ const TabNavigator = () => {
 }
 
 export default function App() {
+  
   return (
      <NavigationContainer style ={styles.container}>
       <Stack.Navigator initialRouteName="Start">
@@ -178,17 +179,17 @@ export default function App() {
             </PressableButton>
             ),
             //delete button
-            headerRight: () => (
-              <PressableButton
-                customStyle={{ marginRight: 15, backgroundColor: Colors.bottomBar}}
-                onPress={() => {
-                  deleteFromDB(navigation.getParam('id'));
-                  navigation.goBack();
-              }}
-              >
-                <AntDesign name="delete" size={24} color="white" />
-              </PressableButton>
-            ),
+            // headerRight: () => (
+            //   <PressableButton
+            //     customStyle={{ marginRight: 15, backgroundColor: Colors.bottomBar}}
+            //     onPress={() => {
+            //       deleteFromDB(route.params?.id); 
+            //       navigation.goBack();
+            //   }}
+            //   >
+            //     <AntDesign name="delete" size={24} color="white" />
+            //   </PressableButton>
+            // ),
           })}
         />
       </Stack.Navigator>
