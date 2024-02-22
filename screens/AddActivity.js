@@ -81,6 +81,7 @@ export default function AddActivity() {
     const [showDate, setShowDate] = useState(false);
     // Store data related to the duration
     const [duration, setDuration] = useState('');
+    const [isChecked, setChecked] = useState(false);
     
     useEffect(() => {
       if (activity) {
@@ -144,7 +145,8 @@ export default function AddActivity() {
           duration: duration, 
           date: new Date(date),
           // By default, set the activity as not special
-          special: false 
+          // special: false,
+          special: isChecked,
         };
     
         // Check if the selected activity is running or weights and the duration is greater than 60 minutes
@@ -177,6 +179,10 @@ export default function AddActivity() {
               },
             ]
           ); 
+          if (isChecked === true && activity.special === true) {
+            newActivity.special = false;
+            setChecked(false);
+          }
         } else {
           // Store the new activity in the database
           const newActivityId = await writeToDB(newActivity);
@@ -185,6 +191,7 @@ export default function AddActivity() {
           setSelectedActivity(null);
           setDuration('');
           setDate('');
+          setChecked(false);
           // Trigger data refresh
           setRefreshData(prevState => !prevState);
           navigation.goBack();
@@ -207,14 +214,6 @@ export default function AddActivity() {
       return () => unsubscribe();
     }, []);
 
-    const [isChecked, setChecked] = useState(false);
-
-    const handleCheckbox = () => {
-      setChecked(!isChecked);
-      
-    };
-    
-    
     return (
       <View style = {styles.container}>
         <Text style={styles.subtitle}>Activity *</Text>
@@ -248,7 +247,6 @@ export default function AddActivity() {
               style={styles.checkbox} 
               value={isChecked} 
               onValueChange={setChecked}
-              onPress={handleCheckbox} 
             />
             <Text style={styles.paragraph}>This item is marked as special. Select the checkbox if you would like to approve it.</Text>
           </View>
@@ -312,7 +310,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '55%',
-    marginTop: '62%',
+    marginTop: '52%',
   },
   button: {
     paddingVertical: 10,
@@ -327,7 +325,7 @@ const styles = StyleSheet.create({
   },
   section: {
     width: '80%',
-    marginTop: 70,
+    marginTop: 20,
     flexDirection: 'row',
     alignItems: 'center',
   },

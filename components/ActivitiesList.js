@@ -17,14 +17,13 @@ export default function ActivitiesList({ type }) {
       const activitiesData = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        activitiesData.push({ id: doc.id, name: data.name, duration: data.duration, date: data.date, special: data.special }); 
+        activitiesData.push({ id: doc.id, ...data }); 
       });
       setActivityArray(activitiesData);
     });
   
     return () => unsubscribe();
   }, []);
-  
   
   // Filter the activities based on the type
   const filteredActivities = (type === 'all') ? activityArray : activityArray.filter(activity => activity.special === (type === 'special'));
