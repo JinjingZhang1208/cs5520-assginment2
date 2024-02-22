@@ -12,8 +12,7 @@ import { deleteFromDB } from '../firebase-files/firestoreHelper';
 import { AntDesign } from '@expo/vector-icons';
 import { database } from '../firebase-files/firebaseSetup';
 import { updateInDB } from '../firebase-files/firestoreHelper';
-import { doc, setDoc } from 'firebase/firestore';
-
+import Checkbox from 'expo-checkbox';
 
 export default function AddActivity() {
     const navigation = useNavigation();
@@ -207,6 +206,14 @@ export default function AddActivity() {
     
       return () => unsubscribe();
     }, []);
+
+    const [isChecked, setChecked] = useState(false);
+
+    const handleCheckbox = () => {
+      setChecked(!isChecked);
+      
+    };
+    
     
     return (
       <View style = {styles.container}>
@@ -235,6 +242,18 @@ export default function AddActivity() {
             onChange={onChangeDate}
           />
         )}
+      {isEditting === 'Edit' && activity.special === true ? (
+          <View style={styles.section}>
+            <Checkbox 
+              style={styles.checkbox} 
+              value={isChecked} 
+              onValueChange={setChecked}
+              onPress={handleCheckbox} 
+            />
+            <Text style={styles.paragraph}>This item is marked as special. Select the checkbox if you would like to approve it.</Text>
+          </View>
+        ) : null}
+
         <View style={styles.buttonContainer}>
           <PressableButton onPress={cancelRedirect} customStyle={styles.button}>
             <Text style={styles.buttonText}>Cancel</Text>
@@ -305,6 +324,19 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
-  }
+  },
+  section: {
+    width: '80%',
+    marginTop: 70,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  paragraph: {
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+  checkbox: {
+    margin: 8,
+  },
 }); 
 
