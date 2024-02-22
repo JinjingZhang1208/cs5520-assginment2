@@ -152,27 +152,47 @@ export default function AddActivity() {
         if ((selectedActivity.toLowerCase() === 'running' || selectedActivity.toLowerCase() === 'weights') && durationNumber > 60) {
           newActivity.special = true; // Mark the activity as special
         }
-        console.log("isEditting:", isEditting);
+       
         if (isEditting === 'Edit') {
-          // Update existing activity
-          console.log("Updating activity with ID:", activity.id);
-          console.log("New activity:", newActivity);
-          await updateInDB(activity.id, newActivity);
+          Alert.alert(
+            'Important',
+            'Are you sure you want to save these changes?',
+            [
+              {
+                text: 'No',
+                style: 'cancel',
+              },
+              {
+                text: 'Yes',
+                onPress: async () => {
+                  try {
+                    await updateInDB(activity.id, newActivity);
+                    // After the update operation is completed, navigate back
+                    navigation.goBack();
+                  } catch (error) {
+                    // Handle any errors that occur during the update operation
+                    console.error('Error updating activity:', error);
+                  }
+                },
+                style: 'destructive',
+              },
+            ]
+          ); 
         } else {
-        // Store the new activity in the database
-        const newActivityId = await writeToDB(newActivity);
-        setActivityId(newActivityId);
-        // console.log(newActivityId);
-       }
-        // Reset state values and navigate back
-        setSelectedActivity(null);
-        setDuration('');
-        setDate('');
-        setRefreshData(prevState => !prevState); // Trigger data refresh
-        navigation.goBack();
+          // Store the new activity in the database
+          const newActivityId = await writeToDB(newActivity);
+          setActivityId(newActivityId);
+          // Reset state values
+          setSelectedActivity(null);
+          setDuration('');
+          setDate('');
+          // Trigger data refresh
+          setRefreshData(prevState => !prevState);
+          navigation.goBack();
+        }
       }
     };
-    
+          
     const [activityArray, setActivityArray] = useState([]);
   
     useEffect(() => {
@@ -286,4 +306,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   }
-});
+}); 
+
