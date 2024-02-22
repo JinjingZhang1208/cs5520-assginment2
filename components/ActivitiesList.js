@@ -1,14 +1,26 @@
-import React, { useContext } from 'react';
-import { ActivityContext } from '../ActivityContext';
+import React, { useState, useEffect } from 'react';
 import { View, FlatList, Text, StyleSheet } from 'react-native';
 import Colors from '../colors';
 import { AntDesign } from '@expo/vector-icons';
+import { database } from '../firebase-files/firebaseSetup';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 export default function ActivitiesList({ type }) {
-  const { activityArray } = useContext(ActivityContext);
+  const [activityArray, setActivities] = useState([]);
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(database, 'activities'), (querySnapshot) => {
+      const activitiesData = [];
+      querySnapshot.forEach((doc) => {
+        activitiesData.push({ id: doc.id, ...doc.data() });
+      });
+      setActivities(activitiesData);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Filter the activities based on the type
-  const filteredActivities = (type === 'all') ? activityArray : activityArray.filter(activity => activity.special);
+  const filteredActivities = (type === 'all') ? activityArray : activityArray.filter(activity => type === 'special' ? activity.special : !activity.special);
 
   const renderItem = ({ item }) => (
     <View style={styles.activityItem}>
@@ -18,7 +30,7 @@ export default function ActivitiesList({ type }) {
         </View>      
         <View style={styles.dateContainer}>
           <Text style={styles.date}>
-            {`${item.date.toLocaleDateString('en-US', { weekday: 'short' })} ${item.date.toLocaleDateString('en-US', { month: 'short' })} ${item.date.getDate()} ${item.date.getFullYear()}`}
+            {item.date && `${new Date(item.date.seconds * 1000).toLocaleDateString('en-US', { weekday: 'short' })} ${new Date(item.date.seconds * 1000).toLocaleDateString('en-US', { month: 'short' })} ${new Date(item.date.seconds * 1000).getDate()} ${new Date(item.date.seconds * 1000).getFullYear()}`}
           </Text>
         </View>
         <View style={styles.durationContainer}>
@@ -27,6 +39,7 @@ export default function ActivitiesList({ type }) {
       </View>
     </View>
   );
+  
 
   return (
     <FlatList

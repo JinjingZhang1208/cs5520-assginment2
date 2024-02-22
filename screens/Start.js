@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Colors from '../colors'
 import { useNavigation } from '@react-navigation/native'; 
 import PressableButton from '../components/PressableButton';
+import { database } from '../firebase-files/firebaseSetup'; 
 
 export default function Start() {
     const navigation = useNavigation(); 

@@ -10,8 +10,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import AddActivity from './screens/AddActivity';
-import { ActivityProvider } from './ActivityContext'; 
 import PressableButton from './components/PressableButton';
+import { deleteFromDB } from './firebase-files/firestoreHelper';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -78,12 +78,6 @@ const TabNavigator = () => {
           headerShown: true,
           headerTitleAlign: 'center',
           headerRight: () => (
-            // <TouchableOpacity
-            //   style={{ marginRight: 15 }}
-            //   onPress={() => navigation.navigate('AddActivity')}
-            // >
-            //   <Text style={styles.headerButtonText}>Add</Text>
-            // </TouchableOpacity>
             <PressableButton
               customStyle={{ marginRight: 15, backgroundColor: Colors.bottomBar}}
               onPress={() => navigation.navigate('AddActivity')}
@@ -113,12 +107,6 @@ const TabNavigator = () => {
         headerShown: true, 
         headerTitleAlign: 'center',
         headerRight: () => (
-          // <TouchableOpacity
-          //   style={{ marginRight: 15 }}
-          //   onPress={() => navigation.navigate('AddActivity')}
-          // >
-          //   <Text style={styles.headerButtonText}>Add</Text>
-          // </TouchableOpacity>
           <PressableButton
               customStyle={{ marginRight: 15, backgroundColor: Colors.bottomBar }}
               onPress={() => navigation.navigate('AddActivity')}
@@ -145,7 +133,6 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-    <ActivityProvider> 
      <NavigationContainer style ={styles.container}>
       <Stack.Navigator initialRouteName="Start">
         <Stack.Screen name="Start" component={StartScreen} options={{ headerShown: false }} />
@@ -156,31 +143,34 @@ export default function App() {
             headerStyle: {
               backgroundColor: Colors.bottomBar,
             },
-            title: 'Add an activity',
+            title: 'Edit',
             headerTintColor: 'white', 
             headerTitleStyle: {
               fontSize: 20, 
             },
             headerLeft: () => (
-              // <TouchableOpacity
-              //   style={{ marginLeft: 10 }}
-              //   onPress={() => navigation.goBack()}
-              // >
-              //   <AntDesign name="left" size={22} color="white" />
-              // </TouchableOpacity>
             <PressableButton
               customStyle={{ marginRight: 10, backgroundColor: Colors.bottomBar }}
               onPress={() => navigation.goBack()}
-              c
             >
               <AntDesign name="left" size={22} color="white" />
             </PressableButton>
-            )
+            ),
+            //the button will only appear if the user is editing an existing activity
+            headerRight: () => (
+              <PressableButton
+                customStyle={{ marginRight: 15, backgroundColor: Colors.bottomBar}}
+                onPress={() => {
+                  deleteFromDB();
+              }}
+              >
+                <AntDesign name="delete" size={24} color="white" />
+              </PressableButton>
+            ),
           })}
         />
       </Stack.Navigator>
      </NavigationContainer>
-     </ActivityProvider> 
   );
 }
 

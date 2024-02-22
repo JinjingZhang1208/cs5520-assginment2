@@ -1,17 +1,23 @@
-import { StyleSheet, Text, TextInput, View, Alert } from 'react-native'
-import React, { useState, useContext } from 'react'
+import { StyleSheet, Text, TextInput, View, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Colors from '../colors';
 import { useNavigation } from '@react-navigation/native';
-import { ActivityContext } from '../ActivityContext';
 import PressableButton from '../components/PressableButton';
+import { writeToDB } from '../firebase-files/firestoreHelper';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { database } from '../firebase-files/firebaseSetup';
 
 export default function AddActivity() {
     const navigation = useNavigation();
-    const { addToActivityArray } = useContext(ActivityContext);
-
-    //store data related to the activity
+    // set default mode to 'add' (add new activity)
+    const [pageMode, setPageMode] = useState('add');
+    //store the id of the activity that the user wants to edit
+    const [activityId, setActivityId] = useState(null); 
+    const [activitiesArray, setActivitiesArray] = useState([]);
+      
+    // Store data related to the activity
     const [open, setOpen] = useState(false);
     const [selectedActivity, setSelectedActivity] = useState(null);
     const [items, setItems] = useState([
@@ -23,11 +29,11 @@ export default function AddActivity() {
       {label: 'Cycling', value: 'Cycling'},
       {label: 'Hiking', value: 'Hiking'},
     ]);
-    //store data related to the date
+    // Store data related to the date
     const [date, setDate] = useState(new Date());
     const [mode, setMode] = useState('date');
     const [showDate, setShowDate] = useState(false);
-    //store data related to the duration
+    // Store data related to the duration
     const [duration, setDuration] = useState('');
     
     const onChangeDate = (event, selectedDate) => {
@@ -45,7 +51,7 @@ export default function AddActivity() {
     showMode('date');
     };
 
-    //format the date to be displayed
+    // Format the date to be displayed
     const formatDate = (date) => {
       if (date) {
         const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
@@ -55,12 +61,12 @@ export default function AddActivity() {
       }
     };
 
-    //Cancel button takes the user back to the previous screen (to the specific tab that they were viewing before).
+    // Cancel button takes the user back to the previous screen (to the specific tab that they were viewing before).
     const cancelRedirect = () => {
       navigation.goBack();
     }
 
-    //validate user's entries (e.g. no negative number or letters for duration, no empty submission,...)
+    // Validate user's entries (e.g. no negative number or letters for duration, no empty submission,...)
     const validateData = () => {
       const durationNumber = parseInt(duration);
       if (
@@ -73,17 +79,34 @@ export default function AddActivity() {
         date === '' || // Check if date is empty
         date === undefined // Check if date is undefined
       ) {
-          Alert.alert('Invalid input', 'Please check your input values', [
-            {text: 'OK'},
-          ]);
+        Alert.alert('Invalid input', 'Please check your input values', [
+          {text: 'OK'},
+        ]);
       } else {
-      // When all validations passed, store the data to the context and redirect the user to the previous screen.
-      addToActivityArray({ name: selectedActivity, duration, date });
-      setSelectedActivity(null);
-      setDuration('');
-      setDate('');
-      navigation.goBack();
-    }}
+        // Create a new activity object
+        const newActivity = {
+          name: selectedActivity,
+          duration: duration,
+          date: date,
+          special: false // By default, set the activity as not special
+        };
+    
+        // Check if the selected activity is running or weights and the duration is greater than 60 minutes
+        if ((selectedActivity.toLowerCase() === 'running' || selectedActivity.toLowerCase() === 'weights') && durationNumber > 60) {
+          newActivity.special = true; // Mark the activity as special
+        }
+    
+        // Store the new activity in the database
+        writeToDB(newActivity);
+    
+        // Reset state values and navigate back
+        setSelectedActivity(null);
+        setDuration('');
+        setDate('');
+        navigation.goBack();
+      }
+    };
+    
 
     return (
       <View style = {styles.container}>
@@ -101,9 +124,6 @@ export default function AddActivity() {
         <Text style={styles.subtitle}>Duration (min) * </Text>
         <TextInput value={duration} onChangeText={setDuration} style={styles.durationContainer}/>
         <Text style={styles.subtitle}>Date</Text>
-        {/* <TouchableOpacity onPress={showDatepicker} style={styles.dateContainer}>
-        <Text style={styles.dateText}>{formatDate(date)}</Text>
-        </TouchableOpacity> */}
         <PressableButton onPress={showDatepicker} customStyle={styles.dateContainer}>
           <Text style={styles.dateText}>{formatDate(date)}</Text>
         </PressableButton>
@@ -116,12 +136,6 @@ export default function AddActivity() {
           />
         )}
         <View style={styles.buttonContainer}>
-          {/* <TouchableOpacity onPress={cancelRedirect} style={styles.button}>
-            <Text style={styles.buttonText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={validateData} style={styles.button}>
-            <Text style={styles.buttonText}>Save</Text>
-          </TouchableOpacity> */}
           <PressableButton onPress={cancelRedirect} customStyle={styles.button}>
             <Text style={styles.buttonText}>Cancel</Text>
           </PressableButton>
@@ -186,10 +200,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 5,
     backgroundColor: Colors.border,
-},
+  },
   buttonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
-}
-})
+  }
+});
