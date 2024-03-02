@@ -1,8 +1,10 @@
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
-import Button from '../components/Button'
+// import Button from '../components/Button'
 import Colors from '../colors'
 import { useNavigation } from '@react-navigation/native'; 
+import PressableButton from '../components/PressableButton';
+import { database } from '../firebase-files/firebaseSetup'; 
 
 export default function Start() {
     const navigation = useNavigation(); 
@@ -15,13 +17,15 @@ export default function Start() {
     const emailHandler = (inputEmail) => {
         setEmail(inputEmail);
         setEmailError('');
-        setInputEmpty(false);
+        // setInputEmpty(false);
+        setInputEmpty(inputEmail.trim().length === 0 && phonenumber.trim().length === 0);
     }
 
     const phonenumberHandler = (inputPhonenumber) => {    
         setPhonenumber(inputPhonenumber);
         setPhonenumberError('');
-        setInputEmpty(false);
+        // setInputEmpty(false);
+        setInputEmpty(email.trim().length === 0 && inputPhonenumber.trim().length === 0);
     } 
 
     const handleReset = () => {
@@ -58,8 +62,16 @@ export default function Start() {
             <TextInput onChangeText={phonenumberHandler} style={styles.input} value={phonenumber}/>
             {phonenumberError ? <Text style={styles.errorMessage}>{phonenumberError}</Text> : null}
             <View style={styles.buttonContainer}>
-                <Button title="Reset" onPress={handleReset} />
-                <Button title="Start" onPress={handleStartButton} disabled={inputEmpty} />
+                {/* <Button title="Reset" onPress={handleReset} />
+                <Button title="Start" onPress={handleStartButton} disabled={inputEmpty} /> */}
+                <PressableButton
+                    customStyle={{ backgroundColor: Colors.border }}
+                    onPress={handleReset}>
+                        <Text style={styles.buttonText}>Reset</Text>
+                </PressableButton>
+                <PressableButton onPress={handleStartButton} disabled={inputEmpty} customStyle={{ backgroundColor: Colors.border }}>
+                    <Text style={inputEmpty ? styles.disabledButtonText : styles.buttonText}>Start</Text>
+                </PressableButton>
             </View>
         </View>
     )
@@ -96,5 +108,13 @@ const styles = StyleSheet.create({
     errorMessage: {
         marginBottom: 10,
         marginTop: 10,
-    }
+    },
+    buttonText: { 
+        color: 'white', 
+        fontSize: 20 
+    },
+    disabledButtonText: {
+        color: 'grey',
+        fontSize: 20,
+    },
 })

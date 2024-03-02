@@ -1,16 +1,69 @@
-import { StyleSheet, Text, TextInput, View, Alert, TouchableOpacity } from 'react-native'
-import React, { useState, useContext } from 'react'
+import { StyleSheet, Text, TextInput, View, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Colors from '../colors';
 import { useNavigation } from '@react-navigation/native';
-import { ActivityContext } from '../ActivityContext';
+import PressableButton from '../components/PressableButton';
+import { writeToDB } from '../firebase-files/firestoreHelper';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { useRoute } from '@react-navigation/native';
+import { deleteFromDB } from '../firebase-files/firestoreHelper';
+import { AntDesign } from '@expo/vector-icons';
+import { database } from '../firebase-files/firebaseSetup';
+import { updateInDB } from '../firebase-files/firestoreHelper';
+import Checkbox from 'expo-checkbox';
 
 export default function AddActivity() {
     const navigation = useNavigation();
-    const { addToActivityArray } = useContext(ActivityContext);
 
-    //store data related to the activity
+    const route = useRoute();
+    const { activity } = route.params || {};
+
+    const [refreshData, setRefreshData] = useState(false); 
+
+    const [isEditting, setIsEditting] = useState(activity ? 'Edit' : 'AddActivity');
+
+    const handleDelete = () => {
+      Alert.alert(
+        'Delete',
+        'Are you sure you want to delete this activity?',
+        [
+          {
+            text: 'No',
+            style: 'cancel',
+          },
+          {
+            text: 'Yes',
+            onPress: async () => {
+              await deleteFromDB(activity.id);
+              setRefreshData(prevState => !prevState); // Trigger data refresh
+              navigation.goBack();
+            },
+            style: 'destructive',
+          },
+        ]
+      );
+    };
+
+    useEffect(() => {
+      // Customize the header with the delete button
+      navigation.setOptions({
+        headerRight: () => (
+          <PressableButton
+              customStyle={{ marginRight: 15, backgroundColor: Colors.bottomBar}}
+              onPress={handleDelete}
+            >
+              <AntDesign name="delete" size={24} color="white" />
+            </PressableButton>
+        ),
+      });
+    }, []);
+
+    //store the id of the activity that the user wants to edit
+    const [activityId, setActivityId] = useState(null); 
+      
+    // Store data related to the activity
     const [open, setOpen] = useState(false);
     const [selectedActivity, setSelectedActivity] = useState(null);
     const [items, setItems] = useState([
@@ -22,13 +75,23 @@ export default function AddActivity() {
       {label: 'Cycling', value: 'Cycling'},
       {label: 'Hiking', value: 'Hiking'},
     ]);
-    //store data related to the date
+    // Store data related to the date
     const [date, setDate] = useState(new Date());
     const [mode, setMode] = useState('date');
     const [showDate, setShowDate] = useState(false);
-    //store data related to the duration
+    // Store data related to the duration
     const [duration, setDuration] = useState('');
+    const [isChecked, setChecked] = useState(false);
     
+    useEffect(() => {
+      if (activity) {
+        setActivityId(activity.id);
+        setSelectedActivity(activity.name);
+        setDuration(activity.duration);
+        setDate(activity.date.toDate());
+      }
+    }, [activity, refreshData]);
+
     const onChangeDate = (event, selectedDate) => {
         const currentDate = selectedDate || date;
         setShowDate(false);
@@ -44,7 +107,7 @@ export default function AddActivity() {
     showMode('date');
     };
 
-    //format the date to be displayed
+    // Format the date to be displayed
     const formatDate = (date) => {
       if (date) {
         const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
@@ -54,13 +117,13 @@ export default function AddActivity() {
       }
     };
 
-    //Cancel button takes the user back to the previous screen (to the specific tab that they were viewing before).
+    // Cancel button takes the user back to the previous screen (to the specific tab that they were viewing before).
     const cancelRedirect = () => {
       navigation.goBack();
     }
 
-    //validate user's entries (e.g. no negative number or letters for duration, no empty submission,...)
-    const validateData = () => {
+    // Validate user's entries (e.g. no negative number or letters for duration, no empty submission,...)
+    const validateData = async () => {
       const durationNumber = parseInt(duration);
       if (
         duration.trim() === '' || // Check for empty or whitespace duration
@@ -72,17 +135,84 @@ export default function AddActivity() {
         date === '' || // Check if date is empty
         date === undefined // Check if date is undefined
       ) {
-          Alert.alert('Invalid input', 'Please check your input values', [
-            {text: 'OK'},
-          ]);
+        Alert.alert('Invalid input', 'Please check your input values', [
+          {text: 'OK'},
+        ]);
       } else {
-      // When all validations passed, store the data to the context and redirect the user to the previous screen.
-      addToActivityArray({ name: selectedActivity, duration, date });
-      setSelectedActivity(null);
-      setDuration('');
-      setDate('');
-      navigation.goBack();
-    }}
+        // Create a new activity object
+        const newActivity = {
+          name: selectedActivity,
+          duration: duration, 
+          date: new Date(date),
+          // By default, set the activity as not special
+          // special: false,
+          special: isChecked,
+        };
+    
+        // Check if the selected activity is running or weights and the duration is greater than 60 minutes
+        if ((selectedActivity.toLowerCase() === 'running' || selectedActivity.toLowerCase() === 'weights') && durationNumber > 60) {
+          newActivity.special = true; // Mark the activity as special
+        }
+       
+        if (isEditting === 'Edit') {
+          Alert.alert(
+            'Important',
+            'Are you sure you want to save these changes?',
+            [
+              {
+                text: 'No',
+                style: 'cancel',
+              },
+              {
+                text: 'Yes',
+                onPress: async () => {
+                  try {
+                    await updateInDB(activity.id, newActivity);
+                    // After the update operation is completed, navigate back
+                    navigation.goBack();
+                  } catch (error) {
+                    // Handle any errors that occur during the update operation
+                    console.error('Error updating activity:', error);
+                  }
+                },
+                style: 'destructive',
+              },
+            ]
+          ); 
+          if (isChecked === true && activity.special === true) {
+            newActivity.special = false;
+            setChecked(false);
+          }
+        } else {
+          // Store the new activity in the database
+          const newActivityId = await writeToDB(newActivity);
+          setActivityId(newActivityId);
+          // Reset state values
+          setSelectedActivity(null);
+          setDuration('');
+          setDate('');
+          setChecked(false);
+          // Trigger data refresh
+          setRefreshData(prevState => !prevState);
+          navigation.goBack();
+        }
+      }
+    };
+          
+    const [activityArray, setActivityArray] = useState([]);
+  
+    useEffect(() => {
+      const unsubscribe = onSnapshot(collection(database, 'activities'), (querySnapshot) => {
+        const activitiesData = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          activitiesData.push({ id: doc.id, name: data.name, duration: data.duration, date: data.date, special: data.special }); 
+        });
+        setActivityArray(activitiesData);
+      });
+    
+      return () => unsubscribe();
+    }, []);
 
     return (
       <View style = {styles.container}>
@@ -100,9 +230,9 @@ export default function AddActivity() {
         <Text style={styles.subtitle}>Duration (min) * </Text>
         <TextInput value={duration} onChangeText={setDuration} style={styles.durationContainer}/>
         <Text style={styles.subtitle}>Date</Text>
-        <TouchableOpacity onPress={showDatepicker} style={styles.dateContainer}>
-        <Text style={styles.dateText}>{formatDate(date)}</Text>
-        </TouchableOpacity>
+        <PressableButton onPress={showDatepicker} customStyle={styles.dateContainer}>
+          <Text style={styles.dateText}>{formatDate(date)}</Text>
+        </PressableButton>
         {showDate && (
           <DateTimePicker
             value={date}
@@ -111,17 +241,27 @@ export default function AddActivity() {
             onChange={onChangeDate}
           />
         )}
+      {isEditting === 'Edit' && activity.special === true ? (
+          <View style={styles.section}>
+            <Checkbox 
+              style={styles.checkbox} 
+              value={isChecked} 
+              onValueChange={setChecked}
+            />
+            <Text style={styles.paragraph}>This item is marked as special. Select the checkbox if you would like to approve it.</Text>
+          </View>
+        ) : null}
+
         <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={cancelRedirect} style={styles.button}>
+          <PressableButton onPress={cancelRedirect} customStyle={styles.button}>
             <Text style={styles.buttonText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={validateData} style={styles.button}>
-              <Text style={styles.buttonText}>Save</Text>
-          </TouchableOpacity>
+          </PressableButton>
+          <PressableButton onPress={validateData} customStyle={styles.button}>
+            <Text style={styles.buttonText}>Save</Text>
+          </PressableButton>
         </View>
       </View>
     );
- 
 }
 
 const styles = StyleSheet.create({
@@ -170,16 +310,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '55%',
-    marginTop: '62%',
+    marginTop: '52%',
   },
   button: {
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
-},
-buttonText: {
+    backgroundColor: Colors.border,
+  },
+  buttonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
-}
-})
+  },
+  section: {
+    width: '80%',
+    marginTop: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  paragraph: {
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+  checkbox: {
+    margin: 8,
+  },
+}); 
+
